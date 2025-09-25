@@ -230,11 +230,71 @@ docker run -p 8000:8000 secureprompt
 - [General Deployment Options](DEPLOYMENT.md)
 
 ### Live Demo
-Once deployed, your API will be available at:
-- Health check: `GET /api/v1/health`
-- API docs: `GET /docs`
-- Check prompt: `POST /api/v1/check`
+🌟 **API is LIVE at: https://secure-prompt.vercel.app**
 
-## License
+Available endpoints:
+- Health check: `GET /api/health`
+- Keywords list: `GET /api/keywords`  
+- Check prompt: `POST /api/check`
+- API root: `GET /`
 
-This project is for educational purposes as part of a thesis project.
+## 🤝 Contributing
+
+We welcome contributions! SecurePrompt is an open-source project and we'd love to have you contribute.
+
+### Quick Start for Contributors
+1. **Fork** the repository
+2. **Create** a feature branch: `git checkout -b feature/amazing-feature`
+3. **Make** your changes and add tests
+4. **Ensure** all tests pass: `pytest app/tests/`
+5. **Submit** a pull request
+
+### Areas We Need Help With
+- 🚀 **Performance optimization** of Aho-Corasick algorithm
+- 🌐 **Additional language support** for keyword detection
+- 📊 **Benchmarking** and performance metrics
+- 📖 **Documentation** improvements
+- 🐛 **Bug fixes** and edge cases
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+### MIT License Summary
+- ✅ **Commercial use** allowed
+- ✅ **Modification** allowed  
+- ✅ **Distribution** allowed
+- ✅ **Private use** allowed
+- ❗ **No warranty** provided
+- ❗ **License and copyright** notice required
+
+## 🙏 Acknowledgments
+
+- **Aho-Corasick Algorithm** - Alfred V. Aho and Margaret J. Corasick (1975)
+- **FastAPI** - Sebastian Ramirez and contributors
+- **Vercel** - For free serverless hosting
+- **Open Source Community** - For inspiration and support
+
+## 📞 Support
+
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/XenchinRyu7/SecurePrompt/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/XenchinRyu7/SecurePrompt/discussions)
+- 📧 **Contact**: [@XenchinRyu7](https://github.com/XenchinRyu7)
+
+---
+
+## 🌟 Show Your Support
+
+If this project helped you, please consider:
+- ⭐ **Starring** the repository
+- 🍴 **Forking** and contributing
+- 📢 **Sharing** with others
+- 💖 **Sponsoring** development
+
+---
+
+**Made with ❤️ for secure AI applications**
+
+*SecurePrompt - Protecting sensitive information in AI prompts since 2025* 🛡️
