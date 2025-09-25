@@ -18,7 +18,7 @@ def test_deployed_api(base_url):
     # Test 1: Health Check
     print("\n1. 🏥 Health Check")
     try:
-        response = requests.get(f"{base_url}/api/v1/health", timeout=30)
+        response = requests.get(f"{base_url}/api/health", timeout=30)
         if response.status_code == 200:
             print(f"   ✅ Status: {response.status_code}")
             print(f"   Response: {response.json()}")
@@ -45,7 +45,7 @@ def test_deployed_api(base_url):
     # Test 3: Keywords endpoint
     print("\n3. 📝 Keywords Endpoint")
     try:
-        response = requests.get(f"{base_url}/api/v1/keywords", timeout=10)
+        response = requests.get(f"{base_url}/api/keywords", timeout=10)
         if response.status_code == 200:
             data = response.json()
             print(f"   ✅ Monitoring {data['count']} keywords")
@@ -62,7 +62,7 @@ def test_deployed_api(base_url):
     }
     try:
         response = requests.post(
-            f"{base_url}/api/v1/check",
+            f"{base_url}/api/check",
             json=test_safe_prompt,
             headers={"Content-Type": "application/json"},
             timeout=10
@@ -86,7 +86,7 @@ def test_deployed_api(base_url):
     }
     try:
         response = requests.post(
-            f"{base_url}/api/v1/check",
+            f"{base_url}/api/check",
             json=test_sensitive_prompt,
             headers={"Content-Type": "application/json"},
             timeout=10
@@ -113,7 +113,7 @@ def test_deployed_api(base_url):
     }
     try:
         response = requests.post(
-            f"{base_url}/api/v1/check",
+            f"{base_url}/api/check",
             json=test_multiple,
             headers={"Content-Type": "application/json"},
             timeout=10
@@ -141,13 +141,13 @@ def test_deployed_api(base_url):
     return True
 
 if __name__ == "__main__":
-    # Default to common Render URL pattern
+    # Default to Vercel URL pattern
     if len(sys.argv) > 1:
         url = sys.argv[1]
     else:
         # Default test URL (update setelah deploy)
-        url = "https://secureprompt-api.onrender.com"
+        url = "https://secure-prompt.vercel.app"
         print(f"🔄 Using default URL: {url}")
-        print("   To test custom URL: python test_deployed_api.py https://your-url.com")
+        print("   To test your URL: python test_deployed_api.py https://your-project.vercel.app")
     
     test_deployed_api(url)

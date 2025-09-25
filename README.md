@@ -202,19 +202,20 @@ Modify the `DEFAULT_SENSITIVE_KEYWORDS` list in `app/core/checker.py` or create 
 
 ### Quick Deploy Options
 
-#### 1. Render.com (Recommended) ⭐
+#### 1. Vercel (Recommended) ⭐
 ```bash
 # Push to GitHub first (sudah done!)
-# Deploy to Render
-# 1. Go to render.com
-# 2. Connect GitHub repo: XenchinRyu7/SecurePrompt
-# 3. Auto-deploy!
+# Deploy to Vercel
+# 1. Go to vercel.com (NO CREDIT CARD NEEDED!)
+# 2. Continue with GitHub
+# 3. Import repo: XenchinRyu7/SecurePrompt
+# 4. Deploy! (1-2 menit)
 ```
 
-#### 2. Railway (Paid)
+#### 2. Render.com
 ```bash
-# Railway no longer free
-# Starting at $5/month
+# Free tier but needs credit card verification
+# 750 hours/month, sleep after 15min idle
 ```
 
 #### 3. Docker
@@ -224,7 +225,9 @@ docker build -t secureprompt .
 docker run -p 8000:8000 secureprompt
 ```
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
+**📖 Detailed Guides:**
+- [Vercel Deploy Guide](VERCEL_DEPLOY.md) - Recommended (No Credit Card!)
+- [General Deployment Options](DEPLOYMENT.md)
 
 ### Live Demo
 Once deployed, your API will be available at:
