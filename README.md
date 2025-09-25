@@ -202,22 +202,19 @@ Modify the `DEFAULT_SENSITIVE_KEYWORDS` list in `app/core/checker.py` or create 
 
 ### Quick Deploy Options
 
-#### 1. Railway (Recommended) ⭐
+#### 1. Render.com (Recommended) ⭐
 ```bash
-# Push to GitHub first
-git init && git add . && git commit -m "Initial commit"
-
-# Deploy to Railway
-# 1. Go to railway.app
-# 2. Connect GitHub repo
+# Push to GitHub first (sudah done!)
+# Deploy to Render
+# 1. Go to render.com
+# 2. Connect GitHub repo: XenchinRyu7/SecurePrompt
 # 3. Auto-deploy!
 ```
 
-#### 2. Render
+#### 2. Railway (Paid)
 ```bash
-# Connect GitHub repo at render.com
-# Build command: pip install -r requirements.txt
-# Start command: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+# Railway no longer free
+# Starting at $5/month
 ```
 
 #### 3. Docker

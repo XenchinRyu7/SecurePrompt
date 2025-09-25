@@ -2,43 +2,34 @@
 
 ## Platform Deployment Gratis Terbaik
 
-### 1. Railway (Recommended) ⭐
-**Pros**: Easy setup, generous free tier, auto-deploy
-**Free tier**: 500 jam/bulan + $5 credit
+### 1. Render.com (Recommended) ⭐
+**Pros**: 100% GRATIS, 750 jam/bulan, HTTPS built-in, auto-deploy
+**Cons**: Sleep mode setelah 15 menit idle (normal untuk free tier)
 
 #### Steps:
-1. **Push ke GitHub**:
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit"
-   git branch -M main
-   git remote add origin https://github.com/username/secureprompt.git
-   git push -u origin main
-   ```
+1. **GitHub Ready**: ✅ Sudah ada di `XenchinRyu7/SecurePrompt`
 
-2. **Deploy di Railway**:
-   - Buka [railway.app](https://railway.app)
-   - Login dengan GitHub
-   - Click "New Project" → "Deploy from GitHub repo"
-   - Pilih repository SecurePrompt
-   - Railway akan auto-detect Python dan deploy!
+2. **Deploy di Render**:
+   - Buka [render.com](https://render.com)
+   - Sign up dengan GitHub
+   - Create "Web Service" → Connect repo
+   - Configure:
+     ```
+     Build Command: pip install -r requirements.txt
+     Start Command: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+     ```
+   - Deploy! (2-3 menit)
 
-3. **Environment Variables** (optional):
-   - Set `PORT=8000` jika diperlukan
+3. **Result**: `https://your-app.onrender.com`
+
+**📖 Detailed Guide**: [RENDER_DEPLOY.md](RENDER_DEPLOY.md)
 
 ---
 
-### 2. Render
-**Pros**: 750 jam gratis/bulan, HTTPS built-in
-**Cons**: Sleep mode setelah 15 menit idle
-
-#### Steps:
-1. Push code ke GitHub
-2. Buka [render.com](https://render.com)
-3. Connect GitHub repo
-4. Set build command: `pip install -r requirements.txt`
-5. Set start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+### 2. Railway (No Longer Free) ❌
+**Status**: Tidak lagi gratis sejak 2023
+**Pricing**: Mulai dari $5/bulan
+**Alternative**: Gunakan Render.com
 
 ---
 
