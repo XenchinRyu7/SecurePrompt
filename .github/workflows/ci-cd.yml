@@ -1,0 +1,52 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run tests
+      run: |
+        python -m pytest app/tests/ -v --tb=short
+    
+    - name: Test direct functionality
+      run: |
+        python simple_test.py
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build Docker image
+      run: |
+        docker build -t secureprompt:latest .
+    
+    - name: Test Docker container
+      run: |
+        docker run -d -p 8000:8000 --name test-container secureprompt:latest
+        sleep 10
+        curl -f http://localhost:8000/api/v1/health || exit 1
+        docker stop test-container
+        docker rm test-container
