@@ -1,6 +1,8 @@
 """
 Vercel serverless function for SecurePrompt API
 """
+from http.server import BaseHTTPRequestHandler
+from urllib.parse import urlparse, parse_qs
 import json
 import os
 import sys
@@ -43,32 +45,27 @@ except Exception as e:
     
     prompt_checker = FallbackChecker()
 
-def handler(request):
-    """Main Vercel handler function"""
-    
-    # CORS headers
-    headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Content-Type': 'application/json'
-    }
-    
-    try:
-        method = request.get('method', 'GET')
-        path = request.get('path', '/')
+class handler(BaseHTTPRequestHandler):
+    def do_OPTIONS(self):
+        """Handle CORS preflight requests"""
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
+
+    def do_GET(self):
+        """Handle GET requests"""
+        self.send_response(200)
+        self.send_header('Content-Type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.end_headers()
         
-        # Handle OPTIONS for CORS
-        if method == 'OPTIONS':
-            return {
-                'statusCode': 200,
-                'headers': headers,
-                'body': ''
-            }
+        parsed_path = urlparse(self.path)
+        path = parsed_path.path
         
-        # Handle GET requests
-        if method == 'GET':
-            if path == '/' or path == '/api' or not path:
+        try:
+            if path == '/' or path == '/api':
                 response = {
                     "message": "SecurePrompt API",
                     "description": "Sensitive prompt protection system using Aho-Corasick algorithm",
@@ -79,36 +76,56 @@ def handler(request):
                         "keywords": "/api/keywords"
                     }
                 }
-            elif path == '/api/health' or path == '/health':
+            elif path == '/api/health':
                 response = {
                     "status": "healthy",
                     "message": "SecurePrompt API is running on Vercel",
                     "timestamp": "2025-09-25"
                 }
-            elif path == '/api/keywords' or path == '/keywords':
+            elif path == '/api/keywords':
                 try:
-                    keywords = prompt_checker.keywords if hasattr(prompt_checker, 'keywords') else prompt_checker.aho_corasick.patterns
+                    if hasattr(prompt_checker, 'keywords'):
+                        keywords = prompt_checker.keywords
+                    elif hasattr(prompt_checker, 'aho_corasick'):
+                        keywords = prompt_checker.aho_corasick.patterns
+                    else:
+                        keywords = ["password", "email", "phone", "nik", "credit card"]
+                    
                     response = {
                         "keywords": keywords,
                         "count": len(keywords)
                     }
-                except:
+                except Exception as e:
                     response = {
                         "keywords": ["password", "email", "phone", "nik", "credit card"],
-                        "count": 5
+                        "count": 5,
+                        "error": str(e)
                     }
             else:
                 response = {"error": f"GET endpoint not found: {path}"}
+                
+            self.wfile.write(json.dumps(response).encode())
+            
+        except Exception as e:
+            error_response = {"error": f"Internal server error: {str(e)}"}
+            self.wfile.write(json.dumps(error_response).encode())
+
+    def do_POST(self):
+        """Handle POST requests"""
+        self.send_response(200)
+        self.send_header('Content-Type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.end_headers()
         
-        # Handle POST requests
-        elif method == 'POST':
-            if path == '/api/check' or path == '/check':
-                try:
-                    body = request.get('body', '{}')
-                    if isinstance(body, str):
-                        data = json.loads(body)
-                    else:
-                        data = body
+        parsed_path = urlparse(self.path)
+        path = parsed_path.path
+        
+        try:
+            if path == '/api/check':
+                content_length = int(self.headers.get('Content-Length', 0))
+                if content_length > 0:
+                    post_data = self.rfile.read(content_length)
+                    data = json.loads(post_data.decode('utf-8'))
                     
                     prompt = data.get('prompt', '')
                     
@@ -116,30 +133,13 @@ def handler(request):
                         response = {"error": "Prompt is required"}
                     else:
                         response = prompt_checker.check_prompt(prompt)
-                        
-                except Exception as e:
-                    response = {"error": f"Error processing request: {str(e)}"}
+                else:
+                    response = {"error": "No data provided"}
             else:
                 response = {"error": f"POST endpoint not found: {path}"}
-        
-        else:
-            response = {"error": f"Method {method} not supported"}
-        
-        return {
-            'statusCode': 200,
-            'headers': headers,
-            'body': json.dumps(response)
-        }
-        
-    except Exception as e:
-        error_response = {
-            "error": f"Internal server error: {str(e)}",
-            "path": request.get('path', 'unknown'),
-            "method": request.get('method', 'unknown')
-        }
-        
-        return {
-            'statusCode': 500,
-            'headers': headers,
-            'body': json.dumps(error_response)
-        }
+                
+            self.wfile.write(json.dumps(response).encode())
+            
+        except Exception as e:
+            error_response = {"error": f"Error processing request: {str(e)}"}
+            self.wfile.write(json.dumps(error_response).encode())
