@@ -42,8 +42,9 @@ async def root():
         "version": "1.0.0",
         "endpoints": {
             "check_prompt": "/api/v1/check",
-            "health": "/api/v1/health",
-            "keywords": "/api/v1/keywords"
+            "health": "/api/v1/health", 
+            "generate": "/api/v1/generate",
+            "chat_completions": "/api/v1/chat/completions"
         }
     }
 

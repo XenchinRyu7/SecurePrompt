@@ -7,24 +7,57 @@ from .aho_corasick import AhoCorasick
 
 # Default list of sensitive keywords
 DEFAULT_SENSITIVE_KEYWORDS = [
+    # Indonesian specific
     "NIK",
+    "NIM", 
+    "NISN",
+    "KTP",
+    "SIM",
+    "NPWP",
+    "rekening bank",
+    "nomor rekening",
+    
+    # Contact info
     "email", 
     "phone",
+    "telepon",
+    "handphone",
+    "hp",
+    "whatsapp",
+    "wa",
+    
+    # Security related
     "password",
-    "credit card",
-    "ssn",
-    "social security",
-    "bank account",
     "pin",
     "cvv",
+    "otp",
+    "kode verifikasi",
+    
+    # Financial
+    "credit card",
+    "kartu kredit", 
+    "debit card",
+    "bank account",
+    "saldo",
+    "transfer",
+    
+    # Identity documents
     "passport",
+    "paspor", 
     "driver license",
+    "birth certificate",
+    "akta lahir",
+    "ijazah",
+    "transkrip",
+    
+    # System security
     "api key",
     "token",
     "secret",
     "private key",
     "confidential",
-    "classified"
+    "classified",
+    "rahasia"
 ]
 
 
@@ -99,3 +132,16 @@ class PromptChecker:
 
 # Global instance for use in API
 prompt_checker = PromptChecker()
+
+
+def check_prompt(prompt: str) -> Dict[str, Any]:
+    """
+    Function wrapper for checking prompts.
+    
+    Args:
+        prompt: User input prompt to check
+        
+    Returns:
+        Dictionary with status and matches/response
+    """
+    return prompt_checker.check_prompt(prompt)
