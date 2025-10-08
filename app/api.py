@@ -227,22 +227,50 @@ def estimate_tokens(text: str) -> int:
     """Rough token estimation: ~4 characters per token"""
     return max(1, len(text) // 4)
 
-def sanitize_prompt(prompt: str, matches: List[Dict[str, Any]]) -> str:
-    """Sanitize prompt by replacing sensitive content with [REDACTED]"""
+def smart_sanitize_prompt(prompt: str, matches: List[Dict[str, Any]]) -> str:
+    """Smart sanitization that completely removes sensitive context"""
     sanitized = prompt
     
-    # Sort matches by position in reverse order to avoid index shifting
-    sorted_matches = sorted(matches, key=lambda x: x['position'], reverse=True)
+    import re
     
-    for match in sorted_matches:
-        keyword = match['keyword']
-        pos = match['position']
-        # Replace the detected keyword with [REDACTED]
-        before = sanitized[:pos]
-        after = sanitized[pos + len(keyword):]
-        sanitized = before + f"[REDACTED-{keyword.upper()}]" + after
+    # More aggressive sanitization - remove entire sensitive phrases
+    sanitization_patterns = [
+        # Indonesian ID patterns
+        (r'\b(?:NIK|nik)\s*[:\s]*\d+', 'ID'),
+        (r'\b(?:NIM|nim)\s*[:\s]*\d+', 'student ID'),
+        (r'\b(?:NISN|nisn)\s*[:\s]*\d+', 'student number'),
+        (r'\b(?:KTP|ktp)\s*[:\s]*\d+', 'ID card'),
+        
+        # Phone patterns
+        (r'\b(?:Phone|phone|Telepon|telepon|HP|hp)\s*[:\s]*\d+', 'phone'),
+        (r'\b08\d{8,11}', 'phone'),
+        (r'\b\+62\d{8,11}', 'phone'),
+        
+        # Email patterns
+        (r'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', 'email'),
+        
+        # Any remaining long numbers that might be IDs
+        (r'\b\d{10,16}\b', 'ID number'),
+    ]
     
+    # Apply patterns
+    for pattern, replacement in sanitization_patterns:
+        sanitized = re.sub(pattern, replacement, sanitized, flags=re.IGNORECASE)
+    
+    # Clean up multiple spaces and normalize
+    sanitized = re.sub(r'\s+', ' ', sanitized).strip()
+    
+    # Additional cleanup for common Indonesian sensitive terms
+    sensitive_terms = ['NIK', 'NIM', 'NISN', 'KTP', 'nik', 'nim', 'nisn', 'ktp']
+    for term in sensitive_terms:
+        sanitized = sanitized.replace(f'{term}:', 'ID:')
+        sanitized = sanitized.replace(f'{term} ', 'ID ')
+        
     return sanitized
+
+def sanitize_prompt(prompt: str, matches: List[Dict[str, Any]]) -> str:
+    """Legacy function - kept for backwards compatibility"""
+    return smart_sanitize_prompt(prompt, matches)
 
 
 @router.post("/generate")
@@ -308,29 +336,32 @@ async def chat_completions(request: ChatCompletionsRequest) -> Dict[str, Any]:
         check_result = check_prompt(user_message)
         
         if check_result["status"] == "SENSITIVE":
-            # BLOCK COMPLETELY - Don't send to LLM at all
-            sensitive_types = [match["keyword"].upper() for match in check_result["matches"]]
-            return {
-                "id": f"chatcmpl-blocked-{int(time.time())}",
-                "object": "chat.completion",
-                "created": int(time.time()),
-                "model": request.model,
-                "choices": [
-                    {
-                        "index": 0,
-                        "message": {
-                            "role": "assistant",
-                            "content": "I cannot process this request as it contains sensitive information that must be protected for privacy and security reasons. Please remove any personal data such as identification numbers, contact information, or confidential details and try again."
-                        },
-                        "finish_reason": "content_filter"
-                    }
-                ],
-                "usage": {
-                    "prompt_tokens": estimate_tokens(user_message),
-                    "completion_tokens": 25,
-                    "total_tokens": estimate_tokens(user_message) + 25
-                }
-            }
+            # SMART FILTERING: Sanitize content and keep original context
+            sanitized_message = smart_sanitize_prompt(user_message, check_result["matches"])
+            
+            # Create modified messages - preserve original system messages but sanitize user content
+            modified_messages = []
+            
+            # Keep original system messages as they come from Moodle
+            for msg in request.messages:
+                if msg.role == "system":
+                    modified_messages.append({
+                        "role": msg.role,
+                        "content": msg.content
+                    })
+                elif msg.role == "user" and msg.content == user_message:
+                    # Replace with sanitized version
+                    modified_messages.append({
+                        "role": "user", 
+                        "content": sanitized_message
+                    })
+                else:
+                    modified_messages.append({
+                        "role": msg.role,
+                        "content": msg.content
+                    })
+                    
+            messages_dict = modified_messages
         else:
             # If safe, send original conversation
             messages_dict = [{"role": msg.role, "content": msg.content} for msg in request.messages]
