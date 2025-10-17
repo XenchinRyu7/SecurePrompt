@@ -120,7 +120,7 @@ data = json.dumps({
     'model': 'llama3.2:latest', 
     'messages': [{'role': 'user', 'content': 'Generate student form with NIM: 12345678, NIK: 3202011234567890'}]
 }).encode()
-req = urllib.request.Request('http://127.0.0.1:8001/api/v1/chat/completions', data=data, headers={'Content-Type': 'application/json'})
+req = urllib.request.Request('http://127.0.0.1:8000/api/v1/chat/completions', data=data, headers={'Content-Type': 'application/json'})
 response = urllib.request.urlopen(req)
 result = json.loads(response.read().decode())
 print('GENERATE TEST:', result['choices'][0]['message']['content'][:300])
@@ -135,7 +135,7 @@ data = json.dumps({
     'model': 'llama3.2:latest',
     'messages': [{'role': 'user', 'content': 'Summarize: Nama: Ahmad, NIM: 12345678, NIK: 3202011234567890, Phone: 081234567890'}]
 }).encode()
-req = urllib.request.Request('http://127.0.0.1:8001/api/v1/chat/completions', data=data, headers={'Content-Type': 'application/json'})
+req = urllib.request.Request('http://127.0.0.1:8000/api/v1/chat/completions', data=data, headers={'Content-Type': 'application/json'})
 response = urllib.request.urlopen(req)
 result = json.loads(response.read().decode())
 print('SUMMARIZE TEST:', result['choices'][0]['message']['content'][:300])
@@ -150,7 +150,7 @@ data = json.dumps({
     'model': 'llama3.2:latest',
     'messages': [{'role': 'user', 'content': 'Explain data structure: NIM: 20220001, NIK: 3201012345678901, Phone: 081987654321'}]
 }).encode()
-req = urllib.request.Request('http://127.0.0.1:8001/api/v1/chat/completions', data=data, headers={'Content-Type': 'application/json'})
+req = urllib.request.Request('http://127.0.0.1:8000/api/v1/chat/completions', data=data, headers={'Content-Type': 'application/json'})
 response = urllib.request.urlopen(req)
 result = json.loads(response.read().decode())
 print('EXPLAIN TEST:', result['choices'][0]['message']['content'][:300])

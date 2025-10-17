@@ -97,7 +97,7 @@ OLLAMA_MODEL=llama3.2:latest
 
 ### Moodle Integration
 ```
-Moodle AI URL: http://127.0.0.1:8001/api/v1/chat/completions
+Moodle AI URL: http://127.0.0.1:8000/api/v1/chat/completions
 Model: llama3.2:latest
 Format: OpenAI ChatGPT compatible
 ```
